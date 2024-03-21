@@ -1,0 +1,3 @@
+[submodule "external/wownero"]
+	path = external/wownero
+	url = https://git.wownero.com/wownero/wownero.git
