@@ -150,7 +150,7 @@ include_directories(${HIDAPI_INCLUDE_DIR})
 # Wownero
 #############
 
-set(WOWNERO_PROJECT_BUILD "${WOWNERO_PROJECT}/build/release" CACHE STRING "Wownero project build directory")
+set(WOWNERO_PROJECT_BUILD "${WOWNERO_PROJECT}/build/Linux/master/release" CACHE STRING "Wownero project build directory")
 message(STATUS "Using wownero build: " ${WOWNERO_PROJECT_BUILD})
 
 list(APPEND CMAKE_MODULE_PATH "${WOWNERO_PROJECT}/cmake")
@@ -278,9 +278,9 @@ add_library(version STATIC IMPORTED)
 set_target_properties(version PROPERTIES IMPORTED_LOCATION
     ${WOWNERO_PROJECT_BUILD}/src/libversion.a)
     
-add_library(randomx STATIC IMPORTED)
-set_target_properties(randomx PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/external/randomx/librandomx.a)
+add_library(randomwow STATIC IMPORTED)
+set_target_properties(randomwow PROPERTIES IMPORTED_LOCATION
+    ${WOWNERO_PROJECT_BUILD}/external/randomwow/librandomx.a)
     
 ########################
 # Build c++ library
@@ -323,7 +323,7 @@ if (BUILD_LIBRARY)
       cncrypto
       multisig
       version
-      randomx
+      randomwow
       epee
       hardforks
       ${wallet_crypto}
@@ -390,7 +390,7 @@ if (BUILD_SAMPLE)
       cncrypto
       multisig
       version
-      randomx
+      randomwow
       epee
       hardforks
       ${wallet_crypto}
@@ -440,7 +440,7 @@ if (BUILD_SCRATCHPAD)
       cncrypto
       multisig
       version
-      randomx
+      randomwow
       epee
       hardforks
       ${wallet_crypto}
@@ -490,7 +490,7 @@ if (BUILD_TESTS)
       cncrypto
       multisig
       version
-      randomx
+      randomwow
       epee
       hardforks
       ${wallet_crypto}
