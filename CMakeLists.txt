@@ -29,18 +29,6 @@ set(BUILD_TESTS OFF)
 set(WOWNERO_PROJECT "${CMAKE_SOURCE_DIR}/external/wownero" CACHE STRING "Wownero project source directory")
 set(WOWNERO_PROJECT_SRC "${WOWNERO_PROJECT}/src")
 
-# header includes
-include_directories(src/)
-include_directories("${WOWNERO_PROJECT}/contrib/epee/include")
-include_directories("${WOWNERO_PROJECT}/external/")
-include_directories("${WOWNERO_PROJECT}/external/easylogging++")
-include_directories("${WOWNERO_PROJECT}/external/rapidjson/include")
-include_directories("${WOWNERO_PROJECT_SRC}/")
-include_directories("${WOWNERO_PROJECT_SRC}/wallet")
-include_directories("${WOWNERO_PROJECT_SRC}/wallet/api")
-include_directories("${WOWNERO_PROJECT_SRC}/hardforks")
-include_directories("${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/")
-
 set(EXTERNAL_LIBS_DIR ${CMAKE_SOURCE_DIR}/external-libs)
 message(STATUS EXTERNAL_LIBS_DIR : ${EXTERNAL_LIBS_DIR})
 
@@ -74,7 +62,6 @@ if (NOT APPLE)
   include(FindProtobuf)
   find_package(Protobuf)
   message(STATUS "Protobuf lib: ${Protobuf_LIBRARY}, inc: ${Protobuf_INCLUDE_DIR}, protoc: ${Protobuf_PROTOC_EXECUTABLE}")
-  include_directories(${Protobuf_INCLUDE_DIR})
 endif()
 
 ############
@@ -92,7 +79,6 @@ set(Boost_NO_BOOST_CMAKE 1)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.58 QUIET REQUIRED COMPONENTS chrono date_time filesystem program_options regex serialization wserialization system thread)
 message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIR}")
-include_directories(${Boost_INCLUDE_DIR})
 
 ############
 # OpenSSL
@@ -110,7 +96,6 @@ endif()
 
 find_package(OpenSSL REQUIRED)
 message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
-include_directories(${OPENSSL_INCLUDE_DIR})
 
 if(STATIC AND NOT IOS)
   if(UNIX)
@@ -126,7 +111,6 @@ endif()
 # libsodium
 ############
 
-include_directories(external/libsodium/include/sodium)
 find_library(SODIUM_LIBRARY sodium REQUIRED)
 message(STATUS "Using libsodium library at ${SODIUM_LIBRARY}")
 
@@ -144,7 +128,28 @@ endif()
 find_package(HIDAPI REQUIRED)
 message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
 add_definitions(-DHAVE_HIDAPI)
-include_directories(${HIDAPI_INCLUDE_DIR})
+
+############
+# Unbound
+############
+
+find_package(Unbound)
+if(NOT UNBOUND_INCLUDE_DIR)
+  message(FATAL_ERROR "Could not find libunbound")
+else()
+  message(STATUS "Found libunbound include (unbound.h) in ${UNBOUND_INCLUDE_DIR}")
+  if(UNBOUND_LIBRARIES)
+    message(STATUS "Found libunbound library")
+    if (WIN32)
+      add_library(unbound STATIC IMPORTED)
+    else()
+      add_library(unbound SHARED IMPORTED)
+    endif()
+    set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES}) 
+  else()
+    message(FATAL_ERROR "Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
+  endif()
+endif()
 
 #############
 # Wownero
@@ -174,29 +179,6 @@ set_target_properties(lmdb PROPERTIES IMPORTED_LOCATION
 add_library(epee STATIC IMPORTED)
 set_target_properties(epee PROPERTIES IMPORTED_LOCATION
     ${WOWNERO_PROJECT_BUILD}/contrib/epee/src/libepee.a)
-
-############
-# Unbound
-############
-
-find_package(Unbound)
-if(NOT UNBOUND_INCLUDE_DIR)
-  message(FATAL_ERROR "Could not find libunbound")
-else()
-  message(STATUS "Found libunbound include (unbound.h) in ${UNBOUND_INCLUDE_DIR}")
-  if(UNBOUND_LIBRARIES)
-    message(STATUS "Found libunbound library")
-    include_directories(${UNBOUND_INCLUDE_DIR})
-    if (WIN32)
-      add_library(unbound STATIC IMPORTED)
-    else()
-      add_library(unbound SHARED IMPORTED)
-    endif()
-    set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES}) 
-  else()
-    message(FATAL_ERROR "Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
-  endif()
-endif()
 
 add_library(rpc_base STATIC IMPORTED)
 set_target_properties(rpc_base PROPERTIES IMPORTED_LOCATION
@@ -299,6 +281,28 @@ set(
 
 if (BUILD_LIBRARY)
   add_library(wownero-cpp SHARED ${LIBRARY_SRC_FILES})
+      
+  target_include_directories(wownero-cpp PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${WOWNERO_PROJECT}/contrib/epee/include"
+      "${WOWNERO_PROJECT}/external/"
+      "${WOWNERO_PROJECT}/external/easylogging++"
+      "${WOWNERO_PROJECT}/external/rapidjson/include"
+      "${WOWNERO_PROJECT_SRC}/"
+      "${WOWNERO_PROJECT_SRC}/wallet"
+      "${WOWNERO_PROJECT_SRC}/wallet/api"
+      "${WOWNERO_PROJECT_SRC}/hardforks"
+      "${WOWNERO_PROJECT_SRC}/crypto"
+      "${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
   
   target_link_libraries(wownero-cpp
       wallet
@@ -337,6 +341,8 @@ if (BUILD_LIBRARY)
       ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
+  
+  target_compile_definitions(wownero-cpp PUBLIC BOOST_DISABLE_PRAGMA_MESSAGE)
 
 if (WIN32)
   target_link_options(wownero-cpp PUBLIC "-Wl,--enable-auto-import,--export-all-symbols")
@@ -367,6 +373,28 @@ if (BUILD_SAMPLE)
   set(SAMPLE_CODE_SRC_FILES test/sample_code.cpp)
   
   add_executable(sample_code ${LIBRARY_SRC_FILES} ${SAMPLE_CODE_SRC_FILES})
+  
+  target_include_directories(sample_code PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${WOWNERO_PROJECT}/contrib/epee/include"
+      "${WOWNERO_PROJECT}/external/"
+      "${WOWNERO_PROJECT}/external/easylogging++"
+      "${WOWNERO_PROJECT}/external/rapidjson/include"
+      "${WOWNERO_PROJECT_SRC}/"
+      "${WOWNERO_PROJECT_SRC}/wallet"
+      "${WOWNERO_PROJECT_SRC}/wallet/api"
+      "${WOWNERO_PROJECT_SRC}/hardforks"
+      "${WOWNERO_PROJECT_SRC}/crypto"
+      "${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
   
   target_link_libraries(sample_code
       wallet
@@ -418,6 +446,28 @@ if (BUILD_SCRATCHPAD)
   
   add_executable(scratchpad ${LIBRARY_SRC_FILES} ${SCRATCHPAD_SRC_FILES})
   
+  target_include_directories(scratchpad PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${WOWNERO_PROJECT}/contrib/epee/include"
+      "${WOWNERO_PROJECT}/external/"
+      "${WOWNERO_PROJECT}/external/easylogging++"
+      "${WOWNERO_PROJECT}/external/rapidjson/include"
+      "${WOWNERO_PROJECT_SRC}/"
+      "${WOWNERO_PROJECT_SRC}/wallet"
+      "${WOWNERO_PROJECT_SRC}/wallet/api"
+      "${WOWNERO_PROJECT_SRC}/hardforks"
+      "${WOWNERO_PROJECT_SRC}/crypto"
+      "${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
+  
   target_link_libraries(scratchpad
       wallet
       rpc_base
@@ -467,6 +517,28 @@ if (BUILD_TESTS)
   set(TEST_SRC_FILES test/wownero_tests.cpp)
   
   add_executable(wownero_tests ${LIBRARY_SRC_FILES} ${TEST_SRC_FILES})
+  
+  target_include_directories(wownero_tests PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${WOWNERO_PROJECT}/contrib/epee/include"
+      "${WOWNERO_PROJECT}/external/"
+      "${WOWNERO_PROJECT}/external/easylogging++"
+      "${WOWNERO_PROJECT}/external/rapidjson/include"
+      "${WOWNERO_PROJECT_SRC}/"
+      "${WOWNERO_PROJECT_SRC}/wallet"
+      "${WOWNERO_PROJECT_SRC}/wallet/api"
+      "${WOWNERO_PROJECT_SRC}/hardforks"
+      "${WOWNERO_PROJECT_SRC}/crypto"
+      "${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
   
   target_link_libraries(wownero_tests
       wallet
