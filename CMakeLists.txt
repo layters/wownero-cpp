@@ -26,8 +26,8 @@ set(BUILD_TESTS OFF)
 # wownero
 ###################
 
-set(WOWNERO_PROJECT "${CMAKE_SOURCE_DIR}/external/wownero" CACHE STRING "Wownero project source directory")
-set(WOWNERO_PROJECT_SRC "${WOWNERO_PROJECT}/src")
+set(WOWNERO_ROOT_DIR "${CMAKE_SOURCE_DIR}/external/wownero" CACHE STRING "Wownero project source directory")
+set(WOWNERO_SRC_DIR "${WOWNERO_ROOT_DIR}/src")
 
 set(EXTERNAL_LIBS_DIR ${CMAKE_SOURCE_DIR}/external-libs)
 message(STATUS EXTERNAL_LIBS_DIR : ${EXTERNAL_LIBS_DIR})
@@ -155,114 +155,114 @@ endif()
 # Wownero
 #############
 
-set(WOWNERO_PROJECT_BUILD "${WOWNERO_PROJECT}/build/Linux/master/release" CACHE STRING "Wownero project build directory")
-message(STATUS "Using wownero build: " ${WOWNERO_PROJECT_BUILD})
+set(WOWNERO_BUILD_DIR "${WOWNERO_ROOT_DIR}/build/Linux/master/release" CACHE STRING "Wownero project build directory")
+message(STATUS "Using wownero build: " ${WOWNERO_BUILD_DIR})
 
-list(APPEND CMAKE_MODULE_PATH "${WOWNERO_PROJECT}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${WOWNERO_ROOT_DIR}/cmake")
 
 add_library(wallet STATIC IMPORTED)
 set_target_properties(wallet PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/lib/libwallet.a)
+    ${WOWNERO_BUILD_DIR}/lib/libwallet.a)
 
 # libwallet-crypto.a provides x86_64 asm for some wallet functions
-if (EXISTS ${WOWNERO_PROJECT_BUILD}/src/crypto/wallet/libwallet-crypto.a)
+if (EXISTS ${WOWNERO_BUILD_DIR}/src/crypto/wallet/libwallet-crypto.a)
   add_library(wallet_crypto_lib STATIC IMPORTED)
   set_target_properties(wallet_crypto_lib PROPERTIES IMPORTED_LOCATION
-      ${WOWNERO_PROJECT_BUILD}/src/crypto/wallet/libwallet-crypto.a)
+      ${WOWNERO_BUILD_DIR}/src/crypto/wallet/libwallet-crypto.a)
   set(wallet_crypto wallet_crypto_lib)
 endif()
 
 add_library(lmdb STATIC IMPORTED)
 set_target_properties(lmdb PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/external/db_drivers/liblmdb/liblmdb.a)
+    ${WOWNERO_BUILD_DIR}/external/db_drivers/liblmdb/liblmdb.a)
 
 add_library(epee STATIC IMPORTED)
 set_target_properties(epee PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/contrib/epee/src/libepee.a)
+    ${WOWNERO_BUILD_DIR}/contrib/epee/src/libepee.a)
 
 add_library(rpc_base STATIC IMPORTED)
 set_target_properties(rpc_base PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/rpc/librpc_base.a)
+    ${WOWNERO_BUILD_DIR}/src/rpc/librpc_base.a)
 
 add_library(net STATIC IMPORTED)
 set_target_properties(net PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/net/libnet.a)
+    ${WOWNERO_BUILD_DIR}/src/net/libnet.a)
     
 add_library(hardforks STATIC IMPORTED)
 set_target_properties(hardforks PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/hardforks/libhardforks.a)
+    ${WOWNERO_BUILD_DIR}/src/hardforks/libhardforks.a)
     
 add_library(easylogging STATIC IMPORTED)
 set_target_properties(easylogging PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/external/easylogging++/libeasylogging.a)
+    ${WOWNERO_BUILD_DIR}/external/easylogging++/libeasylogging.a)
 
 add_library(cryptonote_core STATIC IMPORTED)
 set_target_properties(cryptonote_core PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/cryptonote_core/libcryptonote_core.a)
+    ${WOWNERO_BUILD_DIR}/src/cryptonote_core/libcryptonote_core.a)
 
 add_library(cryptonote_protocol STATIC IMPORTED)
 set_target_properties(cryptonote_protocol PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/cryptonote_protocol/libcryptonote_protocol.a)
+    ${WOWNERO_BUILD_DIR}/src/cryptonote_protocol/libcryptonote_protocol.a)
 
 add_library(cryptonote_basic STATIC IMPORTED)
 set_target_properties(cryptonote_basic PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/cryptonote_basic/libcryptonote_basic.a)
+    ${WOWNERO_BUILD_DIR}/src/cryptonote_basic/libcryptonote_basic.a)
     
 add_library(cryptonote_format_utils_basic STATIC IMPORTED)
 set_target_properties(cryptonote_format_utils_basic PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/cryptonote_basic/libcryptonote_format_utils_basic.a)
+    ${WOWNERO_BUILD_DIR}/src/cryptonote_basic/libcryptonote_format_utils_basic.a)
 
 add_library(mnemonics STATIC IMPORTED)
 set_target_properties(mnemonics PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/mnemonics/libmnemonics.a)
+    ${WOWNERO_BUILD_DIR}/src/mnemonics/libmnemonics.a)
 
 add_library(common STATIC IMPORTED)
 set_target_properties(common PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/common/libcommon.a)
+    ${WOWNERO_BUILD_DIR}/src/common/libcommon.a)
 
 add_library(cncrypto STATIC IMPORTED)
 set_target_properties(cncrypto PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/crypto/libcncrypto.a)
+    ${WOWNERO_BUILD_DIR}/src/crypto/libcncrypto.a)
 
 add_library(ringct STATIC IMPORTED)
 set_target_properties(ringct PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/ringct/libringct.a)
+    ${WOWNERO_BUILD_DIR}/src/ringct/libringct.a)
 
 add_library(ringct_basic STATIC IMPORTED)
 set_target_properties(ringct_basic PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/ringct/libringct_basic.a)
+    ${WOWNERO_BUILD_DIR}/src/ringct/libringct_basic.a)
 
 add_library(blockchain_db STATIC IMPORTED)
 set_target_properties(blockchain_db PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/blockchain_db/libblockchain_db.a)
+    ${WOWNERO_BUILD_DIR}/src/blockchain_db/libblockchain_db.a)
 
 add_library(blocks STATIC IMPORTED)
 set_target_properties(blocks PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/blocks/libblocks.a)
+    ${WOWNERO_BUILD_DIR}/src/blocks/libblocks.a)
 
 add_library(checkpoints STATIC IMPORTED)
 set_target_properties(checkpoints PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/checkpoints/libcheckpoints.a)
+    ${WOWNERO_BUILD_DIR}/src/checkpoints/libcheckpoints.a)
 
 add_library(device STATIC IMPORTED)
 set_target_properties(device PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/device/libdevice.a)
+    ${WOWNERO_BUILD_DIR}/src/device/libdevice.a)
     
 add_library(device_trezor STATIC IMPORTED)
 set_target_properties(device_trezor PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/device_trezor/libdevice_trezor.a)
+    ${WOWNERO_BUILD_DIR}/src/device_trezor/libdevice_trezor.a)
 
 add_library(multisig STATIC IMPORTED)
 set_target_properties(multisig PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/multisig/libmultisig.a)
+    ${WOWNERO_BUILD_DIR}/src/multisig/libmultisig.a)
 
 add_library(version STATIC IMPORTED)
 set_target_properties(version PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/src/libversion.a)
+    ${WOWNERO_BUILD_DIR}/src/libversion.a)
     
 add_library(randomwow STATIC IMPORTED)
 set_target_properties(randomwow PROPERTIES IMPORTED_LOCATION
-    ${WOWNERO_PROJECT_BUILD}/external/randomwow/librandomx.a)
+    ${WOWNERO_BUILD_DIR}/external/randomwow/librandomx.a)
     
 ########################
 # Build c++ library
@@ -285,16 +285,16 @@ if (BUILD_LIBRARY)
   target_include_directories(wownero-cpp PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
       src
-      "${WOWNERO_PROJECT}/contrib/epee/include"
-      "${WOWNERO_PROJECT}/external/"
-      "${WOWNERO_PROJECT}/external/easylogging++"
-      "${WOWNERO_PROJECT}/external/rapidjson/include"
-      "${WOWNERO_PROJECT_SRC}/"
-      "${WOWNERO_PROJECT_SRC}/wallet"
-      "${WOWNERO_PROJECT_SRC}/wallet/api"
-      "${WOWNERO_PROJECT_SRC}/hardforks"
-      "${WOWNERO_PROJECT_SRC}/crypto"
-      "${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      "${WOWNERO_ROOT_DIR}/contrib/epee/include"
+      "${WOWNERO_ROOT_DIR}/external/"
+      "${WOWNERO_ROOT_DIR}/external/easylogging++"
+      "${WOWNERO_ROOT_DIR}/external/rapidjson/include"
+      "${WOWNERO_SRC_DIR}/"
+      "${WOWNERO_SRC_DIR}/wallet"
+      "${WOWNERO_SRC_DIR}/wallet/api"
+      "${WOWNERO_SRC_DIR}/hardforks"
+      "${WOWNERO_SRC_DIR}/crypto"
+      "${WOWNERO_SRC_DIR}/crypto/crypto_ops_builder/include/"
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
@@ -377,16 +377,16 @@ if (BUILD_SAMPLE)
   target_include_directories(sample_code PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
       src
-      "${WOWNERO_PROJECT}/contrib/epee/include"
-      "${WOWNERO_PROJECT}/external/"
-      "${WOWNERO_PROJECT}/external/easylogging++"
-      "${WOWNERO_PROJECT}/external/rapidjson/include"
-      "${WOWNERO_PROJECT_SRC}/"
-      "${WOWNERO_PROJECT_SRC}/wallet"
-      "${WOWNERO_PROJECT_SRC}/wallet/api"
-      "${WOWNERO_PROJECT_SRC}/hardforks"
-      "${WOWNERO_PROJECT_SRC}/crypto"
-      "${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      "${WOWNERO_ROOT_DIR}/contrib/epee/include"
+      "${WOWNERO_ROOT_DIR}/external/"
+      "${WOWNERO_ROOT_DIR}/external/easylogging++"
+      "${WOWNERO_ROOT_DIR}/external/rapidjson/include"
+      "${WOWNERO_SRC_DIR}/"
+      "${WOWNERO_SRC_DIR}/wallet"
+      "${WOWNERO_SRC_DIR}/wallet/api"
+      "${WOWNERO_SRC_DIR}/hardforks"
+      "${WOWNERO_SRC_DIR}/crypto"
+      "${WOWNERO_SRC_DIR}/crypto/crypto_ops_builder/include/"
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
@@ -449,16 +449,16 @@ if (BUILD_SCRATCHPAD)
   target_include_directories(scratchpad PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
       src
-      "${WOWNERO_PROJECT}/contrib/epee/include"
-      "${WOWNERO_PROJECT}/external/"
-      "${WOWNERO_PROJECT}/external/easylogging++"
-      "${WOWNERO_PROJECT}/external/rapidjson/include"
-      "${WOWNERO_PROJECT_SRC}/"
-      "${WOWNERO_PROJECT_SRC}/wallet"
-      "${WOWNERO_PROJECT_SRC}/wallet/api"
-      "${WOWNERO_PROJECT_SRC}/hardforks"
-      "${WOWNERO_PROJECT_SRC}/crypto"
-      "${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      "${WOWNERO_ROOT_DIR}/contrib/epee/include"
+      "${WOWNERO_ROOT_DIR}/external/"
+      "${WOWNERO_ROOT_DIR}/external/easylogging++"
+      "${WOWNERO_ROOT_DIR}/external/rapidjson/include"
+      "${WOWNERO_SRC_DIR}/"
+      "${WOWNERO_SRC_DIR}/wallet"
+      "${WOWNERO_SRC_DIR}/wallet/api"
+      "${WOWNERO_SRC_DIR}/hardforks"
+      "${WOWNERO_SRC_DIR}/crypto"
+      "${WOWNERO_SRC_DIR}/crypto/crypto_ops_builder/include/"
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
@@ -521,16 +521,16 @@ if (BUILD_TESTS)
   target_include_directories(wownero_tests PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
       src
-      "${WOWNERO_PROJECT}/contrib/epee/include"
-      "${WOWNERO_PROJECT}/external/"
-      "${WOWNERO_PROJECT}/external/easylogging++"
-      "${WOWNERO_PROJECT}/external/rapidjson/include"
-      "${WOWNERO_PROJECT_SRC}/"
-      "${WOWNERO_PROJECT_SRC}/wallet"
-      "${WOWNERO_PROJECT_SRC}/wallet/api"
-      "${WOWNERO_PROJECT_SRC}/hardforks"
-      "${WOWNERO_PROJECT_SRC}/crypto"
-      "${WOWNERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      "${WOWNERO_ROOT_DIR}/contrib/epee/include"
+      "${WOWNERO_ROOT_DIR}/external/"
+      "${WOWNERO_ROOT_DIR}/external/easylogging++"
+      "${WOWNERO_ROOT_DIR}/external/rapidjson/include"
+      "${WOWNERO_SRC_DIR}/"
+      "${WOWNERO_SRC_DIR}/wallet"
+      "${WOWNERO_SRC_DIR}/wallet/api"
+      "${WOWNERO_SRC_DIR}/hardforks"
+      "${WOWNERO_SRC_DIR}/crypto"
+      "${WOWNERO_SRC_DIR}/crypto/crypto_ops_builder/include/"
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
