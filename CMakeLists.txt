@@ -129,28 +129,6 @@ find_package(HIDAPI REQUIRED)
 message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
 add_definitions(-DHAVE_HIDAPI)
 
-############
-# Unbound
-############
-
-find_package(Unbound)
-if(NOT UNBOUND_INCLUDE_DIR)
-  message(FATAL_ERROR "Could not find libunbound")
-else()
-  message(STATUS "Found libunbound include (unbound.h) in ${UNBOUND_INCLUDE_DIR}")
-  if(UNBOUND_LIBRARIES)
-    message(STATUS "Found libunbound library")
-    if (WIN32)
-      add_library(unbound STATIC IMPORTED)
-    else()
-      add_library(unbound SHARED IMPORTED)
-    endif()
-    set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES}) 
-  else()
-    message(FATAL_ERROR "Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
-  endif()
-endif()
-
 #############
 # Wownero
 #############
@@ -179,6 +157,28 @@ set_target_properties(lmdb PROPERTIES IMPORTED_LOCATION
 add_library(epee STATIC IMPORTED)
 set_target_properties(epee PROPERTIES IMPORTED_LOCATION
     ${WOWNERO_BUILD_DIR}/contrib/epee/src/libepee.a)
+
+############
+# Unbound
+############
+
+find_package(Unbound)
+if(NOT UNBOUND_INCLUDE_DIR)
+  message(FATAL_ERROR "Could not find libunbound")
+else()
+  message(STATUS "Found libunbound include (unbound.h) in ${UNBOUND_INCLUDE_DIR}")
+  if(UNBOUND_LIBRARIES)
+    message(STATUS "Found libunbound library")
+    if (WIN32)
+      add_library(unbound STATIC IMPORTED)
+    else()
+      add_library(unbound SHARED IMPORTED)
+    endif()
+    set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES}) 
+  else()
+    message(FATAL_ERROR "Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
+  endif()
+endif()
 
 add_library(rpc_base STATIC IMPORTED)
 set_target_properties(rpc_base PROPERTIES IMPORTED_LOCATION
@@ -346,6 +346,10 @@ if (BUILD_LIBRARY)
 
 if (WIN32)
   target_link_options(wownero-cpp PUBLIC "-Wl,--enable-auto-import,--export-all-symbols")
+endif()
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_options(wownero-cpp PRIVATE "-z" "noexecstack")
 endif()
 
   INSTALL(FILES src/daemon/wownero_daemon.h

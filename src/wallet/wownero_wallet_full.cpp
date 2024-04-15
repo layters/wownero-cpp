@@ -128,14 +128,14 @@ namespace wownero {
     return opt_val == boost::none ? false : val == *opt_val;
   }
 
-  // compute m_num_confirmations TODO wownero-project: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
+  // compute m_num_confirmations TODO wownero: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
   void set_num_confirmations(std::shared_ptr<wownero_tx_wallet>& tx, uint64_t blockchain_height) {
     std::shared_ptr<wownero_block>& block = tx->m_block.get();
     if (block->m_height.get() >= blockchain_height || (block->m_height.get() == 0 && !tx->m_in_tx_pool.get())) tx->m_num_confirmations = 0;
     else tx->m_num_confirmations = blockchain_height - block->m_height.get();
   }
 
-  // compute m_num_suggested_confirmations  TODO wownero-project: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
+  // compute m_num_suggested_confirmations  TODO wownero: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
   void set_num_suggested_confirmations(std::shared_ptr<wownero_incoming_transfer>& incoming_transfer, uint64_t blockchain_height, uint64_t block_reward, uint64_t unlock_time) {
     if (block_reward == 0) incoming_transfer->m_num_suggested_confirmations = 0;
     else incoming_transfer->m_num_suggested_confirmations = (incoming_transfer->m_amount.get() + block_reward - 1) / block_reward;
@@ -161,7 +161,7 @@ namespace wownero {
     tx->m_hash = epee::string_tools::pod_to_hex(pd.m_tx_hash);
     tx->m_is_incoming = true;
     tx->m_payment_id = epee::string_tools::pod_to_hex(payment_id);
-    if (tx->m_payment_id->substr(16).find_first_not_of('0') == std::string::npos) tx->m_payment_id = tx->m_payment_id->substr(0, 16);  // TODO wownero-project: this should be part of core wallet
+    if (tx->m_payment_id->substr(16).find_first_not_of('0') == std::string::npos) tx->m_payment_id = tx->m_payment_id->substr(0, 16);  // TODO wownero: this should be part of core wallet
     if (tx->m_payment_id == wownero_tx::DEFAULT_PAYMENT_ID) tx->m_payment_id = boost::none;  // clear default payment id
     tx->m_unlock_time = pd.m_unlock_time;
     tx->m_is_locked = !m_w2.is_transfer_unlocked(pd.m_unlock_time, pd.m_block_height);
@@ -205,7 +205,7 @@ namespace wownero {
     tx->m_hash = epee::string_tools::pod_to_hex(txid);
     tx->m_is_outgoing = true;
     tx->m_payment_id = epee::string_tools::pod_to_hex(pd.m_payment_id);
-    if (tx->m_payment_id->substr(16).find_first_not_of('0') == std::string::npos) tx->m_payment_id = tx->m_payment_id->substr(0, 16);  // TODO wownero-project: this should be part of core wallet
+    if (tx->m_payment_id->substr(16).find_first_not_of('0') == std::string::npos) tx->m_payment_id = tx->m_payment_id->substr(0, 16);  // TODO wownero: this should be part of core wallet
     if (tx->m_payment_id == wownero_tx::DEFAULT_PAYMENT_ID) tx->m_payment_id = boost::none;  // clear default payment id
     tx->m_unlock_time = pd.m_unlock_time;
     tx->m_is_locked = !m_w2.is_transfer_unlocked(pd.m_unlock_time, pd.m_block_height);
@@ -246,7 +246,7 @@ namespace wownero {
     }
 
     // replace transfer amount with destination sum
-    // TODO wownero-project: confirmed tx from/to same account has amount 0 but cached transfer destinations
+    // TODO wownero: confirmed tx from/to same account has amount 0 but cached transfer destinations
     if (*outgoing_transfer->m_amount == 0 && !outgoing_transfer->m_destinations.empty()) {
       uint64_t amount = 0;
       for (const std::shared_ptr<wownero_destination>& destination : outgoing_transfer->m_destinations) amount += *destination->m_amount;
@@ -265,7 +265,7 @@ namespace wownero {
     tx->m_hash = epee::string_tools::pod_to_hex(pd.m_tx_hash);
     tx->m_is_incoming = true;
     tx->m_payment_id = epee::string_tools::pod_to_hex(payment_id);
-    if (tx->m_payment_id->substr(16).find_first_not_of('0') == std::string::npos) tx->m_payment_id = tx->m_payment_id->substr(0, 16);  // TODO wownero-project: this should be part of core wallet
+    if (tx->m_payment_id->substr(16).find_first_not_of('0') == std::string::npos) tx->m_payment_id = tx->m_payment_id->substr(0, 16);  // TODO wownero: this should be part of core wallet
     if (tx->m_payment_id == wownero_tx::DEFAULT_PAYMENT_ID) tx->m_payment_id = boost::none;  // clear default payment id
     tx->m_unlock_time = pd.m_unlock_time;
     tx->m_is_locked = true;
@@ -303,7 +303,7 @@ namespace wownero {
     tx->m_hash = epee::string_tools::pod_to_hex(txid);
     tx->m_is_outgoing = true;
     tx->m_payment_id = epee::string_tools::pod_to_hex(pd.m_payment_id);
-    if (tx->m_payment_id->substr(16).find_first_not_of('0') == std::string::npos) tx->m_payment_id = tx->m_payment_id->substr(0, 16);  // TODO wownero-project: this should be part of core wallet
+    if (tx->m_payment_id->substr(16).find_first_not_of('0') == std::string::npos) tx->m_payment_id = tx->m_payment_id->substr(0, 16);  // TODO wownero: this should be part of core wallet
     if (tx->m_payment_id == wownero_tx::DEFAULT_PAYMENT_ID) tx->m_payment_id = boost::none;  // clear default payment id
     tx->m_unlock_time = pd.m_tx.unlock_time;
     tx->m_is_locked = true;
@@ -342,7 +342,7 @@ namespace wownero {
     }
 
     // replace transfer amount with destination sum
-    // TODO wownero-project: confirmed tx from/to same account has amount 0 but cached transfer destinations
+    // TODO wownero: confirmed tx from/to same account has amount 0 but cached transfer destinations
     if (*outgoing_transfer->m_amount == 0 && !outgoing_transfer->m_destinations.empty()) {
       uint64_t amount = 0;
       for (const std::shared_ptr<wownero_destination>& destination : outgoing_transfer->m_destinations) amount += *destination->m_amount;
@@ -498,10 +498,10 @@ namespace wownero {
    * (3) Modify wownero-wallet-rpc to make this class a friend.
    * (4) Move all logic in wownero-wallet-rpc to wallet2 so all users can access.
    *
-   * Options 2-4 require modification of wownero-project C++.  Of those, (4) is probably ideal.
-   * TODO: open patch on wownero-project which moves common wallet rpc logic (e.g. on_transfer, on_transfer_split) to m_w2.
+   * Options 2-4 require modification of wownero C++.  Of those, (4) is probably ideal.
+   * TODO: open patch on wownero which moves common wallet rpc logic (e.g. on_transfer, on_transfer_split) to m_w2.
    *
-   * Until then, option (1) is used because it allows wownero-project binaries to be used without modification, it's easy, and
+   * Until then, option (1) is used because it allows wownero binaries to be used without modification, it's easy, and
    * anything other than (4) is temporary.
    */
   //------------------------------------------------------------------------------------------------------------------------------
@@ -717,7 +717,7 @@ namespace wownero {
       this->m_sync_end_height = boost::none;
       m_prev_balance = wallet.get_balance();
       m_prev_unlocked_balance = wallet.get_unlocked_balance();
-      m_notification_pool = std::unique_ptr<tools::threadpool>(tools::threadpool::getNewForUnitTests(1));  // TODO (wownero-project): utility can be for general use
+      m_notification_pool = std::unique_ptr<tools::threadpool>(tools::threadpool::getNewForUnitTests(1));  // TODO (wownero): utility can be for general use
     }
 
     ~wallet2_listener() {
@@ -1418,7 +1418,7 @@ namespace wownero {
   wownero_integrated_address wownero_wallet_full::get_integrated_address(const std::string& standard_address, const std::string& payment_id) const {
     MTRACE("get_integrated_address(" << standard_address << ", " << payment_id << ")");
 
-    // TODO wownero-project: this logic is based on wallet_rpc_server::on_make_integrated_address() and should be moved to wallet so this is unecessary for api users
+    // TODO wownero: this logic is based on wallet_rpc_server::on_make_integrated_address() and should be moved to wallet so this is unecessary for api users
 
     // randomly generate payment id if not given, else validate
     crypto::hash8 payment_id_h8;
@@ -1486,7 +1486,7 @@ namespace wownero {
     std::string err;
     uint64_t result = m_w2->get_daemon_blockchain_target_height(err);
     if (!err.empty()) throw std::runtime_error(err);
-    if (result == 0) result = get_daemon_height(); // TODO wownero-project: target height can be 0 when daemon is synced.  Use blockchain height instead
+    if (result == 0) result = get_daemon_height(); // TODO wownero: target height can be 0 when daemon is synced.  Use blockchain height instead
     return result;
   }
   
@@ -1808,7 +1808,7 @@ namespace wownero {
     }
     txs = queried_txs;
 
-    // special case: re-fetch txs if inconsistency caused by needing to make multiple wallet calls  // TODO wownero-project: offer wallet.get_txs(...)
+    // special case: re-fetch txs if inconsistency caused by needing to make multiple wallet calls  // TODO wownero: offer wallet.get_txs(...)
     for (const std::shared_ptr<wownero_tx_wallet>& tx : txs) {
       if (*tx->m_is_confirmed && tx->m_block == boost::none || !*tx->m_is_confirmed & tx->m_block != boost::none) {
         std::cout << "WARNING: Inconsistency detected building txs from multiple wallet2 calls, re-fetching" << std::endl;
@@ -2090,7 +2090,7 @@ namespace wownero {
       tx->m_ring_size = wownero_utils::RING_SIZE;
       tx->m_unlock_time = config.m_unlock_time == boost::none ? 0 : config.m_unlock_time.get();
       tx->m_is_locked = true;
-      if (tx->m_is_relayed.get()) tx->m_last_relayed_timestamp = static_cast<uint64_t>(time(NULL));  // set last relayed timestamp to current time iff relayed  // TODO wownero-project: this should be encapsulated in wallet2
+      if (tx->m_is_relayed.get()) tx->m_last_relayed_timestamp = static_cast<uint64_t>(time(NULL));  // set last relayed timestamp to current time iff relayed  // TODO wownero: this should be encapsulated in wallet2
       out_transfer->m_account_index = config.m_account_index;
       if (config.m_subaddress_indices.size() == 1) out_transfer->m_subaddress_indices.push_back(config.m_subaddress_indices[0]);  // subaddress index is known iff 1 requested  // TODO: get all known subaddress indices here
 
@@ -2160,7 +2160,7 @@ namespace wownero {
       copy.m_account_index = subaddress_indices_pair.first;
       copy.m_sweep_each_subaddress = false;
 
-      // sweep all subaddresses together  // TODO wownero-project: can this reveal outputs belong to the same wallet?
+      // sweep all subaddresses together  // TODO wownero: can this reveal outputs belong to the same wallet?
       if (copy.m_sweep_each_subaddress == boost::none || copy.m_sweep_each_subaddress.get() != true) {
         copy.m_subaddress_indices = subaddress_indices_pair.second;
         std::vector<std::shared_ptr<wownero_tx_wallet>> account_txs = sweep_account(copy);
@@ -2208,7 +2208,7 @@ namespace wownero {
       throw std::runtime_error("Failed to validate sweep_account transfer request");
     }
 
-    // TODO wownero-project: this is default `outputs` in COMMAND_RPC_SWEEP_ALL which is not documented
+    // TODO wownero: this is default `outputs` in COMMAND_RPC_SWEEP_ALL which is not documented
     uint64_t num_outputs = 1;
 
     // prepare parameters for wallet2's create_transactions_all()
@@ -2296,7 +2296,7 @@ namespace wownero {
       tx->m_num_confirmations = 0;
       tx->m_ring_size = wownero_utils::RING_SIZE;
       tx->m_unlock_time = config.m_unlock_time == boost::none ? 0 : config.m_unlock_time.get();
-      if (tx->m_is_relayed.get()) tx->m_last_relayed_timestamp = static_cast<uint64_t>(time(NULL));  // set last relayed timestamp to current time iff relayed  // TODO wownero-project: this should be encapsulated in wallet2
+      if (tx->m_is_relayed.get()) tx->m_last_relayed_timestamp = static_cast<uint64_t>(time(NULL));  // set last relayed timestamp to current time iff relayed  // TODO wownero: this should be encapsulated in wallet2
       out_transfer->m_account_index = config.m_account_index;
       if (config.m_subaddress_indices.size() == 1) out_transfer->m_subaddress_indices.push_back(config.m_subaddress_indices[0]);  // subaddress index is known iff 1 requested  // TODO: get all known subaddress indices here
 
@@ -2432,7 +2432,7 @@ namespace wownero {
       tx->m_ring_size = wownero_utils::RING_SIZE;
       tx->m_unlock_time = config.m_unlock_time == boost::none ? 0 : config.m_unlock_time.get();
       tx->m_is_locked = true;
-      if (tx->m_is_relayed.get()) tx->m_last_relayed_timestamp = static_cast<uint64_t>(time(NULL));  // set last relayed timestamp to current time iff relayed  // TODO wownero-project: this should be encapsulated in wallet2
+      if (tx->m_is_relayed.get()) tx->m_last_relayed_timestamp = static_cast<uint64_t>(time(NULL));  // set last relayed timestamp to current time iff relayed  // TODO wownero: this should be encapsulated in wallet2
       out_transfer->m_account_index = config.m_account_index;
       if (config.m_subaddress_indices.size() == 1) out_transfer->m_subaddress_indices.push_back(config.m_subaddress_indices[0]);  // subaddress index is known iff 1 requested  // TODO: get all known subaddress indices here
       out_transfer->m_destinations = destinations;
@@ -2538,7 +2538,7 @@ namespace wownero {
       tx->m_num_confirmations = 0;
       tx->m_ring_size = wownero_utils::RING_SIZE;
       tx->m_unlock_time = 0;
-      if (tx->m_is_relayed.get()) tx->m_last_relayed_timestamp = static_cast<uint64_t>(time(NULL));  // set last relayed timestamp to current time iff relayed  // TODO wownero-project: this should be encapsulated in wallet2
+      if (tx->m_is_relayed.get()) tx->m_last_relayed_timestamp = static_cast<uint64_t>(time(NULL));  // set last relayed timestamp to current time iff relayed  // TODO wownero: this should be encapsulated in wallet2
       out_transfer->m_destinations[0]->m_amount = *tx_amounts_iter;
 
       // iterate to next element
@@ -2769,7 +2769,7 @@ namespace wownero {
     }
   }
 
-  // implementation based on wownero-project wallet_rpc_server.cpp::on_sign_transfer()
+  // implementation based on wownero wallet_rpc_server.cpp::on_sign_transfer()
   wownero_tx_set wownero_wallet_full::sign_txs(const std::string& unsigned_tx_hex) {
     if (m_w2->key_on_device()) throw std::runtime_error("command not supported by HW wallet");
     if (m_w2->watch_only()) throw std::runtime_error("command not supported by view-only wallet");
@@ -2808,7 +2808,7 @@ namespace wownero {
     }
   }
 
-  // implementation based on wownero-project wallet_rpc_server.cpp::on_submit_transfer()
+  // implementation based on wownero wallet_rpc_server.cpp::on_submit_transfer()
   std::vector<std::string> wownero_wallet_full::submit_txs(const std::string& signed_tx_hex) {
     if (m_w2->key_on_device()) throw std::runtime_error("command not supported by HW wallet");
 
@@ -3579,7 +3579,7 @@ namespace wownero {
     // build parameters for m_w2->get_payments()
     uint64_t min_height = tx_query->m_min_height == boost::none ? 0 : *tx_query->m_min_height;
     uint64_t max_height = tx_query->m_max_height == boost::none ? CRYPTONOTE_MAX_BLOCK_NUMBER : std::min((uint64_t) CRYPTONOTE_MAX_BLOCK_NUMBER, *tx_query->m_max_height);
-    if (min_height > 0) min_height--; // TODO wownero-project: wallet2::get_payments() m_min_height is exclusive, so manually offset to match intended range (issues #5751, #5598)
+    if (min_height > 0) min_height--; // TODO wownero: wallet2::get_payments() m_min_height is exclusive, so manually offset to match intended range (issues #5751, #5598)
     boost::optional<uint32_t> account_index = boost::none;
     if (_query->m_account_index != boost::none) account_index = *_query->m_account_index;
     std::set<uint32_t> subaddress_indices;
@@ -3624,7 +3624,7 @@ namespace wownero {
     // get unconfirmed incoming transfers
     if (is_pool) {
 
-      // update pool state TODO wownero-project: this should be encapsulated in wallet when unconfirmed transfers queried
+      // update pool state TODO wownero: this should be encapsulated in wallet when unconfirmed transfers queried
       std::vector<std::tuple<cryptonote::transaction, crypto::hash, bool>> process_txs;
       m_w2->update_pool_state(process_txs);
       if (!process_txs.empty()) m_w2->process_pool_state(process_txs);
@@ -3853,7 +3853,7 @@ namespace wownero {
 
     // determine sync start height
     uint64_t sync_start_height = start_height == boost::none ? std::max(get_height(), get_restore_height()) : *start_height;
-    if (sync_start_height < get_restore_height()) set_restore_height(sync_start_height); // TODO wownero-project: start height processed > requested start height unless sync height manually set
+    if (sync_start_height < get_restore_height()) set_restore_height(sync_start_height); // TODO wownero: start height processed > requested start height unless sync height manually set
 
     // notify listeners of sync start
     m_w2_listener->on_sync_start(sync_start_height);
